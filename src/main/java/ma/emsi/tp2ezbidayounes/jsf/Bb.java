@@ -52,11 +52,11 @@ public class Bb implements Serializable {
     @Inject
     private FacesContext facesContext;
 
-    private String texteRequeteJson;
-
-    private String texteReponseJson;
-
-    private boolean debug;
+//    private String texteRequeteJson;
+//
+//    private String texteReponseJson;
+//
+//    private boolean debug;
 
 //    @Inject
 //    private JsonUtilPourGemini jsonUtilPourGemini;
@@ -94,21 +94,21 @@ public class Bb implements Serializable {
         return reponse;
     }
 
-    public String getTexteReponseJson() {
-        return texteReponseJson;
-    }
-
-    public void setTexteReponseJson(String texteReponseJson) {
-        this.texteReponseJson = texteReponseJson;
-    }
-
-    public String getTexteRequeteJson() {
-        return texteRequeteJson;
-    }
-
-    public void setTexteRequeteJson(String texteRequeteJson) {
-        this.texteRequeteJson = texteRequeteJson;
-    }
+//    public String getTexteReponseJson() {
+//        return texteReponseJson;
+//    }
+//
+//    public void setTexteReponseJson(String texteReponseJson) {
+//        this.texteReponseJson = texteReponseJson;
+//    }
+//
+//    public String getTexteRequeteJson() {
+//        return texteRequeteJson;
+//    }
+//
+//    public void setTexteRequeteJson(String texteRequeteJson) {
+//        this.texteRequeteJson = texteRequeteJson;
+//    }
 
 //    public boolean isDebug() {
 //        return debug;
@@ -178,6 +178,10 @@ public class Bb implements Serializable {
 //                            "Problème de connexion avec l'API du LLM : " + e.getMessage());
 //            facesContext.addMessage(null, message);
 //        }
+//
+        llmClient.setSystemRole(systemRole);
+        reponse = llmClient.envoyerMessage(question);
+
         afficherConversation();
         return null;
     }

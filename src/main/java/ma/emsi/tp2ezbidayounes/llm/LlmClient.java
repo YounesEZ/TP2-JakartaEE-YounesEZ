@@ -1,5 +1,6 @@
 package ma.emsi.tp2ezbidayounes.llm;
 
+import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.chat.ChatLanguageModel;
@@ -40,6 +41,7 @@ public class LlmClient implements Serializable {
     }
 
     public String envoyerMessage(String question) {
+        this.chatMemory.add(new SystemMessage(this.systemRole));
         return this.assistant.chat(question);
     }
 }

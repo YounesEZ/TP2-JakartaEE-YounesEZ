@@ -1,47 +1,45 @@
 package ma.emsi.tp2ezbidayounes.llm;
 
+import dev.langchain4j.memory.ChatMemory;
+import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.googleai.GoogleAiGeminiChatModel;
 import dev.langchain4j.service.AiServices;
 import jakarta.enterprise.context.Dependent;
-import jakarta.ws.rs.client.*;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 
 import java.io.Serializable;
 
 @Dependent
 public class LlmClient implements Serializable {
-    // Clé pour l'API du LLM
-    private final String key;
-    // Client REST. Facilite les échanges avec une API REST.
-    private Client clientRest; // Pour pouvoir le fermer
-    // Représente un endpoint de serveur REST
-    private final WebTarget target;
+
+    public interface Assistant {
+        String chat(String prompt);
+    }
+
+    private String systemRole;
+    private Assistant assistant;
+    private ChatMemory chatMemory;
 
     public LlmClient() {
-        // Récupère la clé secrète pour travailler avec l'API du LLM, mise dans une variable d'environnement
-        // du système d'exploitation.
-        this.key = System.getenv("GEMINI_KEY");
-        //A ECRIRE...
-        // Client REST pour envoyer des requêtes vers les endpoints de l'API d'OpenAI
-        this.clientRest = ClientBuilder.newClient();
-        // Endpoint REST pour envoyer la question à l'API.
-        this.target = clientRest.target("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=" + this.key);
+
+        ChatLanguageModel modele = GoogleAiGeminiChatModel.builder()
+                .temperature(0.7)
+                .modelName("gemini-1.5-flash")
+                .apiKey(System.getenv("GEMINI_KEY"))
+                .build();
+
+        this.chatMemory = MessageWindowChatMemory.withMaxMessages(10);
+        this.assistant = AiServices.builder(Assistant.class)
+                .chatLanguageModel(modele)
+                .chatMemory(chatMemory)
+                .build();
     }
 
-    /**
-     * Envoie une requête à l'API de Gemini.
-     * @param requestEntity le corps de la requête (en JSON).
-     * @return réponse REST de l'API (corps en JSON).
-     */
-    public Response envoyerRequete(Entity requestEntity) {
-        Invocation.Builder request = target.request(MediaType.APPLICATION_JSON_TYPE);
-        // Envoie la requête POST au LLM
-        return request.post(requestEntity);
+    public void setSystemRole(String systemRole) {
+        this.systemRole = systemRole;
     }
 
-    public void closeClient() {
-        this.clientRest.close();
+    public String envoyerMessage(String question) {
+        return this.assistant.chat(question);
     }
 }

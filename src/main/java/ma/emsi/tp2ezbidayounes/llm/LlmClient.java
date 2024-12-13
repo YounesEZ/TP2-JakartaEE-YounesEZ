@@ -38,10 +38,11 @@ public class LlmClient implements Serializable {
 
     public void setSystemRole(String systemRole) {
         this.systemRole = systemRole;
+        this.chatMemory.clear();
+        this.chatMemory.add(new SystemMessage(this.systemRole));
     }
 
     public String envoyerMessage(String question) {
-        this.chatMemory.add(new SystemMessage(this.systemRole));
         return this.assistant.chat(question);
     }
 }
